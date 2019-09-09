@@ -17,7 +17,9 @@ object TB5_TransformationOperation {
 		//reduceByKey()
 		//sortByKey()
 		//join()
-		cogroup()
+		//cogroup()
+		//mapPartition()
+		mapPartitionWithIndex()
 
 	}
 
@@ -34,6 +36,45 @@ object TB5_TransformationOperation {
 		mapToPaires.foreach(n => println(n))
 
 	}
+
+	/*
+* 	mapPartition算子案例：对每个元素乘以2
+* */
+	def mapPartition(): Unit = {
+		val conf: SparkConf = new SparkConf().setAppName("mapPartition").setMaster("local")
+		val sc = new SparkContext(conf)
+
+		val numbers = Array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+		val lines: RDD[Int] = sc.parallelize(numbers, 2)
+
+		val mapPartitionRDD = lines.mapPartitions(datas => {
+			datas.map(_ * 2)
+		})
+		 mapPartitionRDD.foreach(x => print(x + " "))
+
+	}
+
+	/*
+* 	mapPartitionWithIndex算子案例：对每个元素乘以2
+* */
+	def mapPartitionWithIndex(): Unit = {
+		val conf: SparkConf = new SparkConf().setAppName("mapPartition").setMaster("local")
+		val sc = new SparkContext(conf)
+
+		val numbers = Array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+		val lines: RDD[Int] = sc.parallelize(numbers, 2)
+
+		val mapPartitionsWithIndexRDD = lines.mapPartitionsWithIndex { (positive, iter) => {
+			val re = List[String]()
+			re.++(positive + " : " + iter.next())
+			re.iterator
+		}
+		}
+
+		mapPartitionsWithIndexRDD.foreach(str => println(str))
+
+	}
+
 
 	/*
 	* 	filter算子案例：过滤偶数
@@ -147,5 +188,7 @@ object TB5_TransformationOperation {
 			x._2._2.foreach(yy => println(yy))
 			println("====================")
 		})
+
+		println("bilibala")
 	}
 }
